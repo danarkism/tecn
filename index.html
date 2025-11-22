@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Constancias TecNM</title>
+    
+    <!-- 1. Cargamos React y ReactDOM desde CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- 2. Cargamos Babel para poder usar JSX en el navegador -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- 3. Cargamos Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 4. Fuentes: Montserrat (Google Fonts) -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- 5. Configuración de Tailwind y Fuentes -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Soberana Sans"', 'Montserrat', 'Arial', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Estilos para ocultar scrollbars y ajustes de impresión -->
+    <style>
+        @media print {
+            @page { margin: 0; size: auto; }
+            body { -webkit-print-color-adjust: exact; }
+        }
+        /* Fuente Soberana Sans (Simulada/Fallback) */
+        @font-face {
+            font-family: 'Soberana Sans';
+            src: local('Soberana Sans'), local('SoberanaSans');
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- ICONOS SVG (Para no depender de librerías externas en un solo archivo) ---
+        const IconDownload = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>;
+        const IconFileText = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>;
+        const IconUser = () => <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
+        const IconCalendar = () => <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>;
+        const IconBriefcase = () => <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>;
+        const IconImage = () => <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>;
+        const IconUpload = () => <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>;
+
+        // --- COMPONENTE PRINCIPAL ---
+        const ConstanciaGenerator = () => {
+            const [formData, setFormData] = useState({
+                nombreAlumno: "Daniel Isaias Can Lara",
+                matricula: "21470277",
+                semestre: "noveno",
+                carrera: "Ingeniería en Gestión Empresarial",
+                periodoInicio: "Agosto de 2025",
+                periodoFin: "Enero de 2026",
+                vacacionesInicio: "19 de Diciembre de 2025",
+                vacacionesFin: "07 de Enero de 2026",
+                oficio: "SE-00001/2025",
+                expediente: "", 
+                fechaEmision: "22 de Noviembre de 2025",
+                nombreJefe: "Ing. Jonathan Helí Ortiz Arjona",
+                gradoJefe: "JEFE DEL DEPTO. DE SERVICIOS ESCOLARES",
+                // Imágenes por defecto (URLs públicas)
+                logoIzquierdo: "https://upload.wikimedia.org/wikipedia/commons/f/fc/SEP_Logo_2019.svg", 
+                logoDerecho: "https://upload.wikimedia.org/wikipedia/commons/d/d4/Logo-TecNM-2017.png",
+                marcaAgua: "https://upload.wikimedia.org/wikipedia/commons/d/d4/Logo-TecNM-2017.png",
+                // Pie de página
+                logoFooter1: null, 
+                logoFooter2: null 
+            });
+
+            const handleChange = (e) => {
+                const { name, value } = e.target;
+                setFormData(prev => ({ ...prev, [name]: value }));
+            };
+
+            const handleImageUpload = (e, fieldName) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const imageUrl = URL.createObjectURL(file);
+                    setFormData(prev => ({ ...prev, [fieldName]: imageUrl }));
+                }
+            };
+
+            const handlePrint = () => {
+                window.print();
+            };
+
+            return (
+                <div className="flex flex-col md:flex-row min-h-screen font-sans">
+                
+                {/* --- PANEL DE EDICIÓN (Lado Izquierdo) --- */}
+                <div className="w-full md:w-1/3 bg-white shadow-xl p-6 overflow-y-auto print:hidden border-r border-gray-200 z-20 h-screen sticky top-0 scrollbar-hide">
+                    <div className="mb-6 pb-4 border-b border-gray-100">
+                    <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                        <span className="text-red-800"><IconFileText /></span> Editor de Constancia
+                    </h2>
+                    <p className="text-xs text-gray-500 mt-1">Generador Todo-en-Uno v1.0</p>
+                    </div>
+
+                    <div className="space-y-5 pb-24">
+                    
+                    {/* Sección: Visual */}
+                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 space-y-3">
+                        <h3 className="text-xs font-bold text-blue-800 uppercase tracking-wider flex items-center gap-2">
+                        <IconImage /> Cargar Imágenes
+                        </h3>
+                        <p className="text-[10px] text-blue-600 mb-2">Sube tus archivos locales aquí.</p>
+                        
+                        <div className="space-y-2">
+                            {[
+                                { label: "Logo SEP (img46)", key: "logoIzquierdo" },
+                                { label: "Logo TecNM (img47)", key: "logoDerecho" },
+                                { label: "Marca de Agua (img48)", key: "marcaAgua" },
+                            ].map((item) => (
+                                <div key={item.key} className="flex items-center justify-between bg-white p-2 rounded border border-blue-100">
+                                    <span className="text-xs text-gray-600 font-semibold">{item.label}</span>
+                                    <label className="cursor-pointer text-white bg-blue-600 hover:bg-blue-700 px-2 py-1 rounded text-[10px] flex items-center gap-1 transition-colors">
+                                    <IconUpload /> Subir
+                                    <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, item.key)} />
+                                    </label>
+                                </div>
+                            ))}
+                        
+                            <div className="border-t border-blue-100 my-2 pt-2">
+                                <p className="text-[10px] text-gray-400 font-bold mb-1 uppercase text-center">Pie de Página</p>
+                                {[
+                                    { label: "Logo Pie Izq (INR)", key: "logoFooter1" },
+                                    { label: "Logo Pie Der (CIEES)", key: "logoFooter2" },
+                                ].map((item) => (
+                                    <div key={item.key} className="flex items-center justify-between bg-white p-2 rounded border border-blue-100 mb-2">
+                                        <span className="text-xs text-gray-600 font-semibold">{item.label}</span>
+                                        <label className="cursor-pointer text-white bg-blue-600 hover:bg-blue-700 px-2 py-1 rounded text-[10px] flex items-center gap-1 transition-colors">
+                                        <IconUpload /> Subir
+                                        <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, item.key)} />
+                                        </label>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Sección: Datos del Estudiante */}
+                    <div className="space-y-3">
+                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+                        <IconUser /> Alumno
+                        </h3>
+                        <div className="bg-gray-50 p-3 rounded border border-gray-200 space-y-3">
+                        <div>
+                            <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Nombre Completo</label>
+                            <input type="text" name="nombreAlumno" value={formData.nombreAlumno} onChange={handleChange} className="w-full p-2 text-sm border border-gray-300 rounded focus:border-red-800 outline-none"/>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                            <div>
+                            <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Matrícula</label>
+                            <input type="text" name="matricula" value={formData.matricula} onChange={handleChange} className="w-full p-2 text-sm border border-gray-300 rounded focus:border-red-800 outline-none"/>
+                            </div>
+                            <div>
+                            <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Semestre</label>
+                            <input type="text" name="semestre" value={formData.semestre} onChange={handleChange} className="w-full p-2 text-sm border border-gray-300 rounded focus:border-red-800 outline-none"/>
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Carrera</label>
+                            <input type="text" name="carrera" value={formData.carrera} onChange={handleChange} className="w-full p-2 text-sm border border-gray-300 rounded focus:border-red-800 outline-none"/>
+                        </div>
+                        </div>
+                    </div>
+
+                    {/* Sección: Fechas */}
+                    <div className="space-y-3">
+                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+                        <IconCalendar /> Periodos
+                        </h3>
+                        <div className="bg-gray-50 p-3 rounded border border-gray-200 space-y-3">
+                        <div className="grid grid-cols-2 gap-3">
+                            <div>
+                            <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Inicio Ciclo</label>
+                            <input type="text" name="periodoInicio" value={formData.periodoInicio} onChange={handleChange} className="w-full p-2 text-sm border border-gray-300 rounded"/>
+                            </div>
+                            <div>
+                            <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Fin Ciclo</label>
+                            <input type="text" name="periodoFin" value={formData.periodoFin} onChange={handleChange} className="w-full p-2 text-sm border border-gray-300 rounded"/>
+                            </div>
+                        </div>
+                        <div className="pt-2 border-t border-gray-200">
+                            <label className="block text-[10px] font-bold text-gray-500 uppercase mb-2">Periodo Vacacional</label>
+                            <div className="grid grid-cols-2 gap-3">
+                            <input type="text" name="vacacionesInicio" value={formData.vacacionesInicio} onChange={handleChange} className="w-full p-2 text-sm border border-gray-300 rounded"/>
+                            <input type="text" name="vacacionesFin" value={formData.vacacionesFin} onChange={handleChange} className="w-full p-2 text-sm border border-gray-300 rounded"/>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+
+                    {/* Sección: Administrativa */}
+                    <div className="space-y-3">
+                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+                        <IconBriefcase /> Administrativo
+                        </h3>
+                        <div className="bg-gray-50 p-3 rounded border border-gray-200 space-y-3">
+                        <div className="grid grid-cols-2 gap-3">
+                            <div>
+                                <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">No. Oficio</label>
+                                <input type="text" name="oficio" value={formData.oficio} onChange={handleChange} className="w-full p-2 text-sm border border-gray-300 rounded"/>
+                            </div>
+                            <div>
+                                <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Expediente</label>
+                                <input type="text" name="expediente" value={formData.expediente} onChange={handleChange} className="w-full p-2 text-sm border border-gray-300 rounded"/>
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Fecha Emisión</label>
+                            <input type="text" name="fechaEmision" value={formData.fechaEmision} onChange={handleChange} className="w-full p-2 text-sm border border-gray-300 rounded"/>
+                        </div>
+                        <div>
+                            <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Nombre Firmante</label>
+                            <input type="text" name="nombreJefe" value={formData.nombreJefe} onChange={handleChange} className="w-full p-2 text-sm border border-gray-300 rounded"/>
+                        </div>
+                        <div>
+                            <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Cargo Firmante</label>
+                            <input type="text" name="gradoJefe" value={formData.gradoJefe} onChange={handleChange} className="w-full p-2 text-sm border border-gray-300 rounded"/>
+                        </div>
+                        </div>
+                    </div>
+
+                    </div>
+
+                    <button 
+                    onClick={handlePrint}
+                    className="fixed bottom-0 left-0 md:left-0 md:w-1/3 w-full bg-red-900 hover:bg-red-800 text-white font-medium py-4 px-6 shadow-lg flex items-center justify-center gap-2 transition-colors z-50 uppercase tracking-wide text-sm cursor-pointer"
+                    >
+                    <span className="flex items-center gap-2"><IconDownload /> Descargar PDF</span>
+                    </button>
+                </div>
+
+                {/* --- VISTA PREVIA / DOCUMENTO (Lado Derecho) --- */}
+                <div className="w-full md:w-2/3 bg-gray-500 p-8 overflow-y-auto flex justify-center print:p-0 print:m-0 print:w-full print:bg-white print:h-screen print:overflow-hidden">
+                    
+                    <div 
+                        className="bg-white shadow-2xl print:shadow-none w-[21.59cm] min-h-[27.94cm] relative flex flex-col print:w-full print:h-full box-border mx-auto"
+                        style={{ 
+                            paddingTop: '2cm', 
+                            paddingBottom: '1.5cm',
+                            paddingLeft: '2.5cm', 
+                            paddingRight: '2.5cm',
+                            fontFamily: "'Soberana Sans', 'Montserrat', 'Arial', sans-serif",
+                            color: '#000000'
+                        }}
+                    >
+                    
+                    {/* FONDO: MARCA DE AGUA */}
+                    {formData.marcaAgua && (
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 overflow-hidden pb-20">
+                        <img 
+                            src={formData.marcaAgua} 
+                            alt="Marca de Agua" 
+                            className="w-[75%]" 
+                            style={{ opacity: 0.35 }}
+                        />
+                        </div>
+                    )}
+
+                    {/* ENCABEZADO */}
+                    <div className="flex justify-between items-start mb-6 relative z-10 h-[2.8cm]">
+                        <div className="flex flex-col justify-center h-full w-[40%]">
+                        {formData.logoIzquierdo && (
+                            <img src={formData.logoIzquierdo} alt="Logo SEP" className="h-full object-contain object-left"/>
+                        )}
+                        </div>
+                        
+                        <div className="flex flex-col items-end h-full w-[40%]">
+                            {formData.logoDerecho && (
+                            <img src={formData.logoDerecho} alt="Logo TecNM" className="h-full object-contain object-right"/>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* DATOS SUPERIOR DERECHA */}
+                    <div className="flex justify-end mb-8 relative z-10">
+                        <div className="w-[55%]">
+                            <table className="w-full text-[9pt] border-collapse leading-none">
+                                <tbody>
+                                    <tr>
+                                        <td className="font-bold align-top w-[35%] tracking-tight">DEPENDENCIA:</td>
+                                        <td className="align-top text-right">SERVICIOS ESCOLARES</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="font-bold align-top tracking-tight">OFICIO:</td>
+                                        <td className="align-top text-right">{formData.oficio}</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="font-bold align-top tracking-tight">EXPEDIENTE:</td>
+                                        <td className="align-top text-right">{formData.expediente}</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="font-bold align-top tracking-tight">CLAVE:</td>
+                                        <td className="align-top text-right">04DIT0001X</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="font-bold align-top tracking-tight">ASUNTO:</td>
+                                        <td className="align-top text-right">CONSTANCIA</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    {/* CUERPO */}
+                    <div className="relative z-10 text-[11pt] leading-[1.6] flex-grow">
+                        <div className="font-bold mb-6 tracking-wide text-black">
+                        A QUIEN CORRESPONDA:
+                        </div>
+
+                        <p className="text-justify mb-6 indent-0" style={{ textIndent: '0', marginBottom: '1.5em' }}>
+                        El que suscribe, Jefe del Departamento de Servicios Escolares de este Instituto Tecnológico, hace constar que el C. <span className="font-bold uppercase">{formData.nombreAlumno}</span>, con número de control <span className="font-bold">{formData.matricula}</span>, está inscrito en el <span className="font-bold">{formData.semestre}</span> semestre, del Programa Educativo: <span className="font-bold uppercase">{formData.carrera}</span>, durante el ciclo escolar comprendido del <span className="font-bold">{formData.periodoInicio}</span> al <span className="font-bold">{formData.periodoFin}</span>.
+                        </p>
+
+                        <p className="text-justify mb-6" style={{ marginBottom: '1.5em' }}>
+                        El periodo vacacional de invierno comprende del <span className="font-bold">{formData.vacacionesInicio}</span> al <span className="font-bold">{formData.vacacionesFin}</span>.
+                        </p>
+
+                        <p className="text-justify mb-12">
+                        A petición del interesado y para los fines legales a que haya lugar, se extiende la presente en Lerma, Campeche, a <span className="">{formData.fechaEmision}</span>.
+                        </p>
+                    </div>
+
+                    {/* FIRMA */}
+                    <div className="mb-4 relative z-10 flex flex-col items-center">
+                        <p className="font-bold mb-10 text-[11pt] tracking-widest">ATENTAMENTE</p>
+                        
+                        <div className="text-center mb-10 space-y-1">
+                            <p className="text-[9pt] italic font-medium">"Excelencia en Educación Tecnológica"</p>
+                            <p className="text-[9pt] italic font-medium">"La Técnica en Provincia Engrandece a la Nación"</p>
+                        </div>
+
+                        <div className="w-[80%] max-w-sm border-t border-black pt-2 text-center">
+                        <p className="font-bold uppercase text-[10pt] mb-1">{formData.nombreJefe}</p>
+                        <p className="text-[8pt] font-medium uppercase tracking-tight">{formData.gradoJefe}</p>
+                        </div>
+                    </div>
+
+                    {/* PIE DE PÁGINA */}
+                    <div className="relative z-10 mt-auto w-full flex justify-between items-center pb-2">
+                        
+                        {/* Izq: Logo 1 */}
+                        <div className="w-[20%] flex justify-start items-end">
+                            {formData.logoFooter1 ? (
+                            <img src={formData.logoFooter1} alt="Logo INR" className="h-[1.5cm] object-contain"/>
+                            ) : (
+                            <div className="h-[1.5cm] w-[1.5cm] border border-dashed border-gray-300 flex items-center justify-center text-xs text-gray-400 text-center p-1 rounded bg-gray-50">Logo INR</div>
+                            )}
+                        </div>
+
+                        {/* Centro: Dirección */}
+                        <div className="w-[60%] text-[7pt] text-gray-800 leading-snug text-center">
+                        <p className="font-normal">Carretera Campeche-Escárcega Km. 9</p>
+                        <p className="font-normal">Lerma, Campeche. Tel(s). (981) 81-202-02 Ext. 4300 Fax Ext. 1001</p>
+                        <a 
+                            href="http://www.itcampeche.edu.mx" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-black no-underline hover:text-gray-700 font-normal cursor-pointer"
+                        >
+                            http://www.itcampeche.edu.mx
+                        </a>
+                        </div>
+
+                        {/* Der: Logo 2 */}
+                        <div className="w-[20%] flex justify-end items-end">
+                            {formData.logoFooter2 ? (
+                            <img src={formData.logoFooter2} alt="Logo CIEES" className="h-[1.5cm] object-contain"/>
+                            ) : (
+                            <div className="h-[1.5cm] w-[1.5cm] border border-dashed border-gray-300 flex items-center justify-center text-xs text-gray-400 text-center p-1 rounded bg-gray-50">Logo CIEES</div>
+                            )}
+                        </div>
+
+                    </div>
+
+                    </div>
+                </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<ConstanciaGenerator />);
+    </script>
+</body>
+</html>
