@@ -298,30 +298,30 @@
                         </div>
                     </div>
 
-                    {/* DATOS SUPERIOR DERECHA */}
+                    {/* DATOS SUPERIOR DERECHA (AJUSTADO) */}
                     <div className="flex justify-end mb-8 relative z-10">
-                        <div className="w-[55%]">
-                            <table className="w-full text-[9pt] border-collapse leading-none">
+                        <div className="w-auto"> {/* Ancho automático para ajustar al contenido */}
+                            <table className="text-[9pt] border-collapse leading-none">
                                 <tbody>
                                     <tr>
-                                        <td className="font-bold align-top w-[35%] tracking-tight">DEPENDENCIA:</td>
-                                        <td className="align-top text-right">SERVICIOS ESCOLARES</td>
+                                        <td className="font-bold align-top pr-3 py-0 tracking-tight text-right">DEPENDENCIA:</td>
+                                        <td className="align-top text-left py-0">SERVICIOS ESCOLARES</td>
                                     </tr>
                                     <tr>
-                                        <td className="font-bold align-top tracking-tight">OFICIO:</td>
-                                        <td className="align-top text-right">{formData.oficio}</td>
+                                        <td className="font-bold align-top pr-3 py-0 tracking-tight text-right">OFICIO:</td>
+                                        <td className="align-top text-left py-0">{formData.oficio}</td>
                                     </tr>
                                     <tr>
-                                        <td className="font-bold align-top tracking-tight">EXPEDIENTE:</td>
-                                        <td className="align-top text-right">{formData.expediente}</td>
+                                        <td className="font-bold align-top pr-3 py-0 tracking-tight text-right">EXPEDIENTE:</td>
+                                        <td className="align-top text-left py-0">{formData.expediente}</td>
                                     </tr>
                                     <tr>
-                                        <td className="font-bold align-top tracking-tight">CLAVE:</td>
-                                        <td className="align-top text-right">04DIT0001X</td>
+                                        <td className="font-bold align-top pr-3 py-0 tracking-tight text-right">CLAVE:</td>
+                                        <td className="align-top text-left py-0">04DIT0001X</td>
                                     </tr>
                                     <tr>
-                                        <td className="font-bold align-top tracking-tight">ASUNTO:</td>
-                                        <td className="align-top text-right">CONSTANCIA</td>
+                                        <td className="font-bold align-top pr-3 py-0 tracking-tight text-right">ASUNTO:</td>
+                                        <td className="align-top text-left py-0">CONSTANCIA</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -343,7 +343,7 @@
                         </p>
 
                         <p className="text-justify mb-12">
-                        A petición del interesado y para los fines legales a que haya lugar, se extiende la presente en Lerma, Campeche, a <span className="">{formData.fechaEmision}</span>.
+                        A petición del interesado y para los fines legales a que haya lugar, se extiende la presente en Lerma, Campeche, a <span className="font-bold">{formData.fechaEmision}</span>.
                         </p>
                     </div>
 
@@ -352,8 +352,8 @@
                         <p className="font-bold mb-10 text-[11pt] tracking-widest">ATENTAMENTE</p>
                         
                         <div className="text-center mb-10 space-y-1">
-                            <p className="text-[9pt] italic font-medium">"Excelencia en Educación Tecnológica"</p>
-                            <p className="text-[9pt] italic font-medium">"La Técnica en Provincia Engrandece a la Nación"</p>
+                            <p className="text-[9pt] italic font-bold">"Excelencia en Educación Tecnológica"</p>
+                            <p className="text-[9pt] italic font-bold">"La Técnica en Provincia Engrandece a la Nación"</p>
                         </div>
 
                         <div className="w-[80%] max-w-sm border-t border-black pt-2 text-center">
